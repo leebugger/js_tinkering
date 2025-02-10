@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Vega-lite Interactive Map</title>
+        <script src="https://cdn.jsdelivr.net/npm/vega@5.30.0"></script>
+        <script src="https://cdn.jsdelivr.net/npm/vega-lite@5.21.0"></script>
+        <script src="https://cdn.jsdelivr.net/npm/vega-embed@6.26.0"></script>
+    </head>
+    <body>
+        <h1>California Counties Map</h1>
+        <div id="map"></div>
+
+        <script>
+          const caMapSpec = {
+            "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+            "width": 600,
+            "height": 700,
+            "data": {
+              "url": "https://vega.github.io/vega-datasets/data/us-10m.json",
+              "format": {
+                "type": "topojson",
+                "feature": "counties"
+              }
+            },
+            "transform": [
+              {
+                "filter": "datum.id >= 6000 && datum.id < 7000"  //California county FIPS codes range from 06000 to 06999
+              },
+              {
+                "lookup": "id",
+                "from": {
+                    "data": {
+                        "values": [
+                            {"id": 6037, "name": "Los Angeles County", "population": "150,000", "highlight": 1},  // (FIPS: 06037)
+                            {"id": 6075, "name":"San Francisco County","population": "100,000", "highlight": 1},  //(FIPS: 06075)
+                            {"id": 6059, "name":"Orange County","population": "45,000", "highlight": 1},   //  (FIPS: 06059)
+                            {"id": 6029, "name":"Kern County","population": "10,000","highlight": 1},   //  (FIPS: 06029)
+                            {"id": 6047, "name":"Merced County ","population": "15,000", "highlight": 1},   // (FIPS: 06047)
+                            {"id": 6089, "name":"Shasta County", "population": "5,000","highlight": 1},   //  (FIPS: 06089)
+                            {"id": 6093, "name":"Siskiyou County", "population": "2,500","highlight": 1}   //(FIPS: 06093)
+                        ]
+                    },
+                    "key": "id",
+                    "fields": ["name","population","highlight"]
+                }}
+            ],
+            "projection": {
+              "type": "albersUsa"
+            },
+            "mark": "geoshape",
+            "encoding": {
+              "color": {
+                "condition": {
+                    "test": "datum.highlight === 1",
+                    "value": "green"  
+                    
+                },
+                "value": "#DAF7A6"  // else default color for non-highlighted counties 
+            },
+            "tooltip": [
+                {"field": "id", "type": "nominal", "title": "FIPS Code"},
+                {"field": "name", "type": "nominal", "title": "County Name"},
+                {"field": "population", "type": "nominal", "title": "Current Population"}
+            ],
+            "stroke": {"value": "black"},
+            "strokeWidth": {"value": 0.5}
+        },
+        "selection": {
+        "hover": {
+            "type": "single",
+            "on": "mouseover",
+            "empty": "none"
+        } 
+    }
+    };
+        vegaEmbed("#map", caMapSpec).catch(console.error);
+        </script>
+    <p>This is a fun activity to practice using <b>Vega-Lite</b> for interactive visualizations. 
+        California counties are correctly in place, however population data for this map is <b>completely made up.</b> 
+        Do not reuse. Proceed with care. </p>    
+</body>
+</html>
